@@ -27,6 +27,7 @@ public class GameServlet extends HttpServlet {
 		//response.getWriter().append("Request at: ").append(request.getContextPath());
 	    if (request.getParameter("spawn") != null) {
 	        response.getWriter().append("Spawned!");
+	        System.out.println("hello");
 	    }
 	}
 
