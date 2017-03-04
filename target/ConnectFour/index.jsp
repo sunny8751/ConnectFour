@@ -10,12 +10,24 @@
 	<table align="center" style="width:70%">
 	<%! int[][] board = new int[6][7]; %>
 	<% for (int i = 0; i < board.length; i++) { %>
+		<% if (i == 0) { %>
+		<tr>
+			<% for (int j = 0; j < board[0].length; j++) { %>
+				<td>
+					<form action="GameServlet" method="GET" style="text-align:center">
+						<button name="spawn" value="1" style="text-align:center; width:80px">Red</button>
+					</form>
+				</td>
+			<% } %>
+		</tr>
+		<% } %>
+
 		<tr>
 		<% for (int j = 0; j < board[0].length; j++) { %>
 			<%! String src = ""; %>
 			<%
 				if (board[i][j] == 0) { 
-					src = "white_circle.svg";
+					src = "red_circle.svg";
 				} else if (board[i][j] == 1) {
 				    src = "red_circle";
 				} else if (board[i][j] == 2) {
@@ -28,9 +40,13 @@
 	<% } %>
 	</table>
 
-	<form action="GameServlet" method="GET" style="text-align:center">
-		<button name="spawn" value="1" style="width:100px">Red</button>
-		<button name="spawn" value="2" style="width:100px">Blue</button>
-	</form>
+<%-- 	<% for (int i = 0; i < board[0].length; i++) { %> --%>
+<!-- 		<button type="button" style="width: 100px">Click Me!</button> -->
+<%-- 	<% } %> --%>
+
+<!-- 	<form action="GameServlet" method="GET" style="text-align:center"> -->
+<!-- 		<button name="spawn" value="1" style="width:100px">Red</button> -->
+<!-- 		<button name="spawn" value="2" style="width:100px">Blue</button> -->
+<!-- 	</form> -->
 </body>
 </html>
