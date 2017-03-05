@@ -9,6 +9,7 @@ public class GameLogic {
     // 1- Player (red)
     // 2- Computer (blue)
 
+    private boolean playerTurn = true;
     private String playerName = "Player";
     private String winner = "";
     private Random rand;
@@ -16,6 +17,17 @@ public class GameLogic {
     public GameLogic(int rows, int cols) {
         board = new int[rows][cols];
         rand = new Random();
+    }
+    
+    public void turn(int col) {
+        if (isGameOver()) {
+            return;
+        }
+        if (playerTurn) {
+            playerTurn(col);
+        } else {
+            computerTurn();
+        }
     }
 
     public void playerTurn(int col) {
@@ -26,9 +38,7 @@ public class GameLogic {
         if (row != -1) {
             board[row][col] = 1;
             checkStatus(row, col, 1);
-            if (!isGameOver()) {
-                computerTurn();
-            }
+            playerTurn = false;
         }
     }
 
@@ -45,6 +55,7 @@ public class GameLogic {
         }
         board[row][col] = 2;
         checkStatus(row, col, 2);
+        playerTurn = true;
     }
 
     private void checkStatus(int row, int col, int id) {
@@ -154,6 +165,10 @@ public class GameLogic {
         winner = "";
     }
     
+    public void setPlayerMove(boolean playerTurn) {
+        this.playerTurn = playerTurn;
+    }
+    
     public void setPlayerName(String name) {
         playerName = name;
     }
@@ -172,6 +187,10 @@ public class GameLogic {
     
     public boolean isGameOver() {
         return !winner.equals("");
+    }
+    
+    public boolean isPlayerTurn() {
+        return playerTurn;
     }
     
     public String getWinner() {

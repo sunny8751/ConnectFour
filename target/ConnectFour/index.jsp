@@ -3,11 +3,15 @@
 <head>
 	<title>Connect Four</title>
 </head>
-<body>
+<body style="background-color:lightgrey;">
 	<h1 style="text-align:center">Connect Four</h1>
 	<h3 style="text-align:center">Created by Sunwoo Yim</h3>
 	<form action="GameServlet" method="POST" style="text-align:center">
-		Name: <input type="text" name="name"></input><br/>
+		Name:<br/>
+		<input type="text" name="name"></input><br><br>
+		Who goes first?<br>
+		<input type="radio" name="firstMove" value="Player">Player</input><br>
+		<input type="radio" name="firstMove" value="Computer">Computer</input><br>
 		<input type="submit"></input>
 	</form>
 </body>

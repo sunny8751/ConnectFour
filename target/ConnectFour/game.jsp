@@ -3,16 +3,26 @@
 <html>
 <head>
 	<title>Connect Four</title>
+	<style>
+		${tableStyle}
+		h1, h3, form {
+			text-align:center;
+		}
+		img {
+			width:64px;
+			height:64px;
+		}
+	</style>
 </head>
-<body>
+<body style="background-color:lightgrey;">
 	<h1 style="text-align:center">Connect Four</h1>
 	<h3 style="text-align:center">Created by Sunwoo Yim</h3>
 
 	<h1 style = "text-align:center">${winner}</h1>
 
-	${boardView}
+	${boardView}<br>
 
-	<form action="GameServlet" method="GET" style="text-align:center">
+	<form action="GameServlet" method="GET">
 		<button name="play" value="-1" style="width:100px; height:60px">Start Over</button>
 	</form>
 </body>

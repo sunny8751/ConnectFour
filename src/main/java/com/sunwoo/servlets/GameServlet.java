@@ -40,26 +40,28 @@ public class GameServlet extends HttpServlet {
                 int value = Integer.parseInt(request.getParameter("play"));
                 if (value == -1) {
                     //clear board if -1 is passed, aka the "Start Over" button
-                    if (gl.isGameOver()) {
-                        gl.startOver();
-                        request.getRequestDispatcher("/index.jsp").forward(request, response);
-                        return;
-                    } else {
-                        gl.clearBoard();
-                    }
+                    gl.startOver();
+                    request.getRequestDispatcher("/index.jsp").forward(request, response);
+                    return;
                 } else {
                     //play the turn
-                    gl.playerTurn(value);
+                    gl.turn(value);
                 }
             } catch (NumberFormatException e) {
                 //System.out.println("Not a valid number");
             }
         }
+        if (!gl.isPlayerTurn()) {
+            gl.turn(-1);
+        }
         if (gl.isGameOver()) {
             request.setAttribute("winner", gl.getWinner());
-//            if (request.getAttribute("boardView") != null) {
-//                request.removeAttribute("boardView");
+            request.setAttribute("tableStyle", "tr, td { border: 1px solid black;text-align:center;}");
+//            if (request.getAttribute("tableStyle") != null) {
+//                request.removeAttribute("tableStyle");
 //            }
+        } else {
+            request.setAttribute("tableStyle", "tr:not(:first-child) td { border: 1px solid black;text-align:center;}");
         }
         request.setAttribute("boardView", getBoardView());
         request.getRequestDispatcher("/game.jsp").forward(request, response);
@@ -73,6 +75,12 @@ public class GameServlet extends HttpServlet {
             throws ServletException, IOException {
         String name = request.getParameter("name");
         gl.setPlayerName(name);
+        String firstMove = request.getParameter("firstMove");
+        if (firstMove.equals("Player")) {
+            gl.setPlayerMove(true);
+        } else {
+            gl.setPlayerMove(false);
+        }
         doGet(request, response);
     }
 
@@ -85,9 +93,9 @@ public class GameServlet extends HttpServlet {
                 view += "<tr>";
                 for (int j = 0; j < gl.getColLength(); j++) {
                     view += "<td>";
-                    view += "<form action=\"GameServlet\" method=\"GET\" style=\"text-align:center\">";
+                    view += "<form action=\"GameServlet\" method=\"GET\">";
                     view += String.format(
-                            "<button name=\"play\" value=\"%d\" style=\"text-align:center; width:80px\">Move</button>",
+                            "<button name=\"play\" value=\"%d\" style=\"text-align:center; width:64px; height:30px\">Move</button>",
                             j);
                     view += "</form>";
                     view += "</td>";
@@ -98,8 +106,7 @@ public class GameServlet extends HttpServlet {
             // render board
             view += "<tr>";
             for (int j = 0; j < gl.getColLength(); j++) {
-                view += String.format("<td><img alt=\"Slot\" src=%s style=\"width:64px;height:64px;\"></td>",
-                        gl.getImage(i, j));
+                view += String.format("<td><img alt=\"Coin\" src=%s></td>", gl.getImage(i, j));
             }
             view += "</tr>";
 
