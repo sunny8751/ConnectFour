@@ -1,53 +1,105 @@
 package com.sunwoo.servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sunwoo.game.GameLogic;
+
+@WebServlet(urlPatterns = "/GameServlet")
 /**
  * Servlet implementation class GameServlet
  */
 public class GameServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-    //neither-0
-	//red-1
-	//blue-2
-	int[][] board = new int[6][7];
-	
+    private static final long serialVersionUID = 1L;
+    private GameLogic gl;
+
     /**
      * @see HttpServlet#HttpServlet()
      */
     public GameServlet() {
         super();
+        gl = new GameLogic(6, 7);
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    PrintWriter out = response.getWriter();
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>");
-        out.println("Servlet title");
-        out.println("</title>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("THIS IS THE CONTENT FOR THE PAGE");
-        out.println("</body>");
-        out.println("</html>");
-	}
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
+     */
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if (request.getParameter("play") == null) {
+            //clear board when there is no parameter passed
+            gl.clearBoard();
+        } else {
+            try {
+                int value = Integer.parseInt(request.getParameter("play"));
+                if (value == -1) {
+                    //clear board if -1 is passed, aka the "Start Over" button
+                    gl.clearBoard();
+                } else {
+                    //play the turn
+                    gl.playerTurn(value);
+                }
+            } catch (NumberFormatException e) {
+                //System.out.println("Not a valid number");
+            }
+        }
+        if (gl.isGameOver()) {
+            request.setAttribute("winner", gl.getWinner());
+            if (request.getAttribute("boardView") != null) {
+                request.removeAttribute("boardView");
+            }
+        } else {
+            request.setAttribute("boardView", getBoardView());
+        }
+        request.getRequestDispatcher("/game.jsp").forward(request, response);
+    }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//doGet(request, response);
-	}
+    /**
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+     *      response)
+     */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // TODO Auto-generated method stub
+        //doGet(request, response);
+    }
+
+    private String getBoardView() {
+        String view = "";
+        view += "<table align=\"center\" style=\"width:70%\">";
+        for (int i = 0; i < gl.getRowLength(); i++) {
+            // render column buttons
+            if (i == 0) {
+                view += "<tr>";
+                for (int j = 0; j < gl.getColLength(); j++) {
+                    view += "<td>";
+                    view += "<form action=\"GameServlet\" method=\"GET\" style=\"text-align:center\">";
+                    view += String.format(
+                            "<button name=\"play\" value=\"%d\" style=\"text-align:center; width:80px\">Move</button>",
+                            j);
+                    view += "</form>";
+                    view += "</td>";
+                }
+                view += "</tr>";
+            }
+
+            // render board
+            view += "<tr>";
+            for (int j = 0; j < gl.getColLength(); j++) {
+                view += String.format("<td><img alt=\"Slot\" src=%s style=\"width:64px;height:64px;\"></td>",
+                        gl.getImage(i, j));
+            }
+            view += "</tr>";
+
+        }
+        view += "</table>";
+        return view;
+    }
 
 }
