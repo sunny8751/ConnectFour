@@ -9,7 +9,7 @@ public class GameLogic {
     // 1- Player (red)
     // 2- Computer (blue)
 
-    private String playerName = "Sunwoo";
+    private String playerName = "Player";
     private String winner = "";
     private Random rand;
 
@@ -26,7 +26,9 @@ public class GameLogic {
         if (row != -1) {
             board[row][col] = 1;
             checkStatus(row, col, 1);
-            computerTurn();
+            if (!isGameOver()) {
+                computerTurn();
+            }
         }
     }
 
@@ -44,7 +46,7 @@ public class GameLogic {
         board[row][col] = 2;
         checkStatus(row, col, 2);
     }
-    
+
     private void checkStatus(int row, int col, int id) {
         //check if someone won
         checkHorizontal(row, col, id);
@@ -55,8 +57,8 @@ public class GameLogic {
         //check if there is a draw
         //board must be full
         boolean fullBoard = true;
-        for (int i = 0; i < getRowLength(); i++) {
-            if (board[i][0] == 0) {
+        for (int i = 0; i < getColLength(); i++) {
+            if (board[0][i] == 0) {
                 fullBoard = false;
             }
         }
@@ -64,7 +66,7 @@ public class GameLogic {
             setWinner(-1);
         }
     }
-    
+
     private void setWinner(int id) {
         if (id == -1) {
             winner = "It's a draw!";
@@ -74,7 +76,7 @@ public class GameLogic {
             winner = "Computer is the winner!";
         }
     }
-    
+
     private void checkHorizontal(int row, int col, int id) {
         int count = 0;
         for (int i = 3; i >= -3; i--) {
@@ -145,6 +147,15 @@ public class GameLogic {
     
     public void clearBoard() {
         board = new int[getRowLength()][getColLength()];
+    }
+    
+    public void startOver() {
+        clearBoard();
+        winner = "";
+    }
+    
+    public void setPlayerName(String name) {
+        playerName = name;
     }
 
     public String getImage(int row, int col) {

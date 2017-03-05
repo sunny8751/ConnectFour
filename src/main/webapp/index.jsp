@@ -5,5 +5,10 @@
 </head>
 <body>
 	<h1 style="text-align:center">Connect Four</h1>
+	<h3 style="text-align:center">Created by Sunwoo Yim</h3>
+	<form action="GameServlet" method="POST" style="text-align:center">
+		Name: <input type="text" name="name"></input><br/>
+		<input type="submit"></input>
+	</form>
 </body>
 </html>

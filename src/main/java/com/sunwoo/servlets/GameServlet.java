@@ -40,7 +40,13 @@ public class GameServlet extends HttpServlet {
                 int value = Integer.parseInt(request.getParameter("play"));
                 if (value == -1) {
                     //clear board if -1 is passed, aka the "Start Over" button
-                    gl.clearBoard();
+                    if (gl.isGameOver()) {
+                        gl.startOver();
+                        request.getRequestDispatcher("/index.jsp").forward(request, response);
+                        return;
+                    } else {
+                        gl.clearBoard();
+                    }
                 } else {
                     //play the turn
                     gl.playerTurn(value);
@@ -51,12 +57,11 @@ public class GameServlet extends HttpServlet {
         }
         if (gl.isGameOver()) {
             request.setAttribute("winner", gl.getWinner());
-            if (request.getAttribute("boardView") != null) {
-                request.removeAttribute("boardView");
-            }
-        } else {
-            request.setAttribute("boardView", getBoardView());
+//            if (request.getAttribute("boardView") != null) {
+//                request.removeAttribute("boardView");
+//            }
         }
+        request.setAttribute("boardView", getBoardView());
         request.getRequestDispatcher("/game.jsp").forward(request, response);
     }
 
@@ -66,8 +71,9 @@ public class GameServlet extends HttpServlet {
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        //doGet(request, response);
+        String name = request.getParameter("name");
+        gl.setPlayerName(name);
+        doGet(request, response);
     }
 
     private String getBoardView() {
@@ -75,7 +81,7 @@ public class GameServlet extends HttpServlet {
         view += "<table align=\"center\" style=\"width:70%\">";
         for (int i = 0; i < gl.getRowLength(); i++) {
             // render column buttons
-            if (i == 0) {
+            if (i == 0 && !gl.isGameOver()) {
                 view += "<tr>";
                 for (int j = 0; j < gl.getColLength(); j++) {
                     view += "<td>";
