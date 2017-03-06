@@ -23,7 +23,7 @@ public class GameServlet extends HttpServlet {
      */
     public GameServlet() {
         super();
-        gl = new GameLogic(6, 7);
+        gl = new GameLogic(8,8);
     }
 
     /**

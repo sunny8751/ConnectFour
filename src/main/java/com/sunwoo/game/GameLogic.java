@@ -39,7 +39,7 @@ public class GameLogic {
         }
         if (row != -1) {
             board[row][col] = 1;
-            checkStatus(board, row, col, 1);
+            checkStatus(board, 1);
             playerTurn = false;
         }
     }
@@ -67,7 +67,7 @@ public class GameLogic {
             }
         }
         board[row][col] = 2;
-        checkStatus(board, row, col, 2);
+        checkStatus(board, 2);
         playerTurn = true;
     }
     
@@ -76,22 +76,22 @@ public class GameLogic {
         Node root = new Node(board);
         int value = minimax(root, true, 1);
         board[root.bestRow][root.bestCol] = 2;
-        checkStatus(board, root.bestRow, root.bestCol, 2);
+        checkStatus(board, 2);
         playerTurn = true;
     }
     
     private void hardComputerTurn() {
         //BOSS LEVEL: minimax theorem to look-ahead and use an intelligent strategy
         Node root = new Node(board);
-        int value = minimax(root, true, 6);
+        int value = minimax(root, true, 2);
         board[root.bestRow][root.bestCol] = 2;
-        checkStatus(board, root.bestRow, root.bestCol, 2);
+        checkStatus(board, 2);
         playerTurn = true;
     }
     
     private int minimax(Node node, boolean maximum, int depth) {
 //        System.out.println("----------DEPTH " + depth + "--------");
-        if (depth == 0 || node.isLeafNode()) {
+        if (depth == 0 || node.isLeafNode() || checkIfWon(node.board, maximum ? 2 : 1)) {
 //            System.out.format("(%d, %d) for %s = %d\n", node.chosenRow, node.chosenCol, maximum ? "Computer" : "Player",node.getValue(maximum ? 2 : 1));
             return node.getValue(maximum ? 2 : 1);
         }
@@ -174,10 +174,10 @@ public class GameLogic {
             //System.out.format("(%d, %d) = %d\n", chosenRow, chosenCol, 1);
             //System.out.format("(%d, %d) = %b\n", chosenRow, chosenCol, checkIfWon(chosenRow, chosenCol, 1));
             //value of the node based on how good it is to move there
-            if (checkIfWon(board, chosenRow, chosenCol, id)) {
+            if (checkIfWon(board, id)) {
 //                System.out.format("(%d, %d) = %d\n", chosenRow, chosenCol, 1);
                 return 1;
-            } else if (checkIfWon(board, chosenRow, chosenCol, (id == 1) ? 2 : 1)) {
+            } else if (checkIfWon(board, (id == 1) ? 2 : 1)) {
 //                System.out.format("(%d, %d) = %d\n", chosenRow, chosenCol, -1);
                 return -1;
             } else {
@@ -191,8 +191,8 @@ public class GameLogic {
         }
     }
 
-    private void checkStatus(int[][] board, int row, int col, int id) {
-        if (checkIfWon(board, row, col, id)) {
+    private void checkStatus(int[][] board, int id) {
+        if (checkIfWon(board, id)) {
             if (id == 1) {
                 winner = String.format("%s is the winner!", playerName);
             } else if (id == 2){
@@ -206,85 +206,127 @@ public class GameLogic {
         }
     }
     
-    private boolean checkIfWon(int[][] board, int row, int col, int id) {
+    private boolean checkIfWon(int[][] board, int id) {
         //check if someone won
-        boolean h = checkHorizontal(board, row, col, id);
-        boolean v = checkVertical(board, row, col, id);
-        boolean rd = checkRightDiagonal(board, row, col, id); //bottom left corner to top right corner
-        boolean ld = checkLeftDiagonal(board, row, col, id); //bottom right corner to top left corner
+        boolean h = checkHorizontal(board, id);
+        boolean v = checkVertical(board, id);
+        boolean rd = checkRightDiagonal(board, id); //bottom left corner to top right corner
+        boolean ld = checkLeftDiagonal(board, id); //bottom right corner to top left corner
         if (h || v || rd || ld) {
             return true;
         }
         return false;
     }
 
-    private boolean checkHorizontal(int[][] board, int row, int col, int id) {
+    private boolean checkHorizontal(int[][] board, int id) {
         int count = 0;
-        for (int i = 3; i >= -3; i--) {
-            if (col + i < 0 || col + i >= getColLength()) {
-                continue;
-            }
-            if (board[row][col + i] == id) {
-                count++;
-                if (count == 4) {
-                    return true;
+        for (int i = 0; i < getRowLength(); i++) {
+            count = 0;
+            for (int j = 0; j < getColLength(); j++) {
+                if (board[i][j] == id) {
+                    count++;
+                    if (count == 4) {
+                        return true;
+                    }
+                } else {
+                    count = 0;
                 }
-            } else {
-                count = 0;
             }
         }
         return false;
     }
     
-    private boolean checkVertical(int[][] board, int row, int col, int id) {
+    private boolean checkVertical(int[][] board, int id) {
         int count = 0;
-        for (int i = 3; i >= -3; i--) {
-            if (row + i < 0 || row + i >= getRowLength()) {
-                continue;
-            }
-            if (board[row + i][col] == id) {
-                count++;
-                if (count == 4) {
-                    return true;
+        for (int j = 0; j < getColLength(); j++) {
+            count = 0;
+            for (int i = 0; i < getRowLength(); i++) {
+                if (board[i][j] == id) {
+                    count++;
+                    if (count == 4) {
+                        return true;
+                    }
+                } else {
+                    count = 0;
                 }
-            } else {
-                count = 0;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkRightDiagonal(int[][] board, int id) {
+        int count;
+        for (int i = 0; i < getRowLength(); i++) {
+            count = 0;
+            int row = i;
+            int col = 0;
+            while (row >= 0) {
+                if (board[row][col] == id) {
+                    count++;
+                    if (count == 4) {
+                        return true;
+                    }
+                } else {
+                    count = 0;
+                }
+                row--;
+                col++;
+            }
+        }
+        for (int j = 0; j < getColLength(); j++) {
+            count = 0;
+            int row = getRowLength() - 1;
+            int col = j;
+            while (col < getColLength()) {
+                if (board[row][col] == id) {
+                    count++;
+                    if (count == 4) {
+                        return true;
+                    }
+                } else {
+                    count = 0;
+                }
+                row--;
+                col++;
             }
         }
         return false;
     }
     
-    private boolean checkRightDiagonal(int[][] board, int row, int col, int id) {
-        int count = 0;
-        for (int i = 3; i >= -3; i--) {
-            if (row + i < 0 || row + i >= getRowLength() || col - i < 0 || col - i >= getColLength()) {
-                continue;
-            }
-            if (board[row + i][col - i] == id) {
-                count++;
-                if (count == 4) {
-                    return true;
+    private boolean checkLeftDiagonal(int[][] board, int id) {
+        int count;
+        for (int i = 0; i < getRowLength(); i++) {
+            count = 0;
+            int row = i;
+            int col = getColLength() - 1;
+            while (row >= 0) {
+                if (board[row][col] == id) {
+                    count++;
+                    if (count == 4) {
+                        return true;
+                    }
+                } else {
+                    count = 0;
                 }
-            } else {
-                count = 0;
+                row--;
+                col--;
             }
         }
-        return false;
-    }
-    
-    private boolean checkLeftDiagonal(int[][] board, int row, int col, int id) {
-        int count = 0;
-        for (int i = 3; i >= -3; i--) {
-            if (row + i < 0 || row + i >= getRowLength() || col + i < 0 || col + i >= getColLength()) {
-                continue;
-            }
-            if (board[row + i][col + i] == id) {
-                count++;
-                if (count == 4) {
-                    return true;
+        for (int j = 0; j < getColLength(); j++) {
+            count = 0;
+            int row = getRowLength() - 1;
+            int col = j;
+            while (col >= 0) {
+                if (board[row][col] == id) {
+                    count++;
+                    if (count == 4) {
+                        return true;
+                    }
+                } else {
+                    count = 0;
                 }
-            } else {
-                count = 0;
+                row--;
+                col--;
             }
         }
         return false;
