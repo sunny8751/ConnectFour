@@ -81,6 +81,8 @@ public class GameServlet extends HttpServlet {
         } else {
             gl.setPlayerMove(false);
         }
+        String difficulty = request.getParameter("difficulty");
+        gl.setDifficulty(difficulty);
         doGet(request, response);
     }
 

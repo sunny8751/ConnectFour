@@ -1,2 +1,3 @@
 com/sunwoo/game/GameLogic.class
 com/sunwoo/servlets/GameServlet.class
+com/sunwoo/game/GameLogic$Node.class
