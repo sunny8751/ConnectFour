@@ -83,7 +83,7 @@ public class GameLogic {
     private void hardComputerTurn() {
         //BOSS LEVEL: minimax theorem to look-ahead and use an intelligent strategy
         Node root = new Node(board);
-        int value = minimax(root, true, 2);
+        int value = minimax(root, true, 6);
         board[root.bestRow][root.bestCol] = 2;
         checkStatus(board, root.bestRow, root.bestCol, 2);
         playerTurn = true;
@@ -105,7 +105,7 @@ public class GameLogic {
                 if (bestValue == childValue) {
                     node.bestCol = child.chosenCol;
                     node.bestRow = child.chosenRow;
-                    System.out.format("(%d, %d) for %s = %d\n", child.chosenRow, child.chosenCol, "Player", bestValue);
+//                    System.out.format("(%d, %d) for %s = %d\n", child.chosenRow, child.chosenCol, "Player", bestValue);
                 }
             }
             return bestValue;
@@ -117,7 +117,7 @@ public class GameLogic {
                 int childValue = node.getValue(1) + minimax(child, true, depth - 1);
                 bestValue = Math.min(bestValue, childValue);
                 if (bestValue == childValue) {
-                    System.out.format("(%d, %d) for %s = %d\n", child.chosenRow, child.chosenCol, "Computer", bestValue);
+//                    System.out.format("(%d, %d) for %s = %d\n", child.chosenRow, child.chosenCol, "Computer", bestValue);
 //                    node.bestCol = child.chosenCol;
 //                    node.bestRow = child.chosenRow;
                 }
