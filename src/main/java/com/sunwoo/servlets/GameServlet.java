@@ -23,7 +23,7 @@ public class GameServlet extends HttpServlet {
      */
     public GameServlet() {
         super();
-        gl = new GameLogic(8,8);
+        gl = new GameLogic(6,7);
     }
 
     /**
@@ -48,7 +48,6 @@ public class GameServlet extends HttpServlet {
                     gl.turn(value);
                 }
             } catch (NumberFormatException e) {
-                //System.out.println("Not a valid number");
             }
         }
         if (!gl.isPlayerTurn()) {
@@ -57,9 +56,6 @@ public class GameServlet extends HttpServlet {
         if (gl.isGameOver()) {
             request.setAttribute("winner", gl.getWinner());
             request.setAttribute("tableStyle", "tr, td { border: 1px solid black;text-align:center;}");
-//            if (request.getAttribute("tableStyle") != null) {
-//                request.removeAttribute("tableStyle");
-//            }
         } else {
             request.setAttribute("tableStyle", "tr:not(:first-child) td { border: 1px solid black;text-align:center;}");
         }

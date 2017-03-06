@@ -74,7 +74,7 @@ public class GameLogic {
     private void mediumComputerTurn() {
         //STANDARD LEVEL: attempts to block the player when needed, but doesn't operate with any advanced strategy
         Node root = new Node(board);
-        int value = minimax(root, true, 1);
+        minimax(root, true, 2);
         board[root.bestRow][root.bestCol] = 2;
         checkStatus(board, 2);
         playerTurn = true;
@@ -83,29 +83,33 @@ public class GameLogic {
     private void hardComputerTurn() {
         //BOSS LEVEL: minimax theorem to look-ahead and use an intelligent strategy
         Node root = new Node(board);
-        int value = minimax(root, true, 2);
+        minimax(root, true, 6);
         board[root.bestRow][root.bestCol] = 2;
         checkStatus(board, 2);
         playerTurn = true;
     }
-    
+
     private int minimax(Node node, boolean maximum, int depth) {
-//        System.out.println("----------DEPTH " + depth + "--------");
         if (depth == 0 || node.isLeafNode() || checkIfWon(node.board, maximum ? 2 : 1)) {
-//            System.out.format("(%d, %d) for %s = %d\n", node.chosenRow, node.chosenCol, maximum ? "Computer" : "Player",node.getValue(maximum ? 2 : 1));
-            return node.getValue(maximum ? 2 : 1);
+            return node.getValue();
         }
         if (maximum) {
             //this is the computer's level in the tree
             //the goal is to choose the best move
             int bestValue = -1000000;
-            for(Node child : node.getChildren(1)) {
-                int childValue = node.getValue(2) + minimax(child, false, depth - 1);
-                bestValue = Math.max(bestValue, childValue);
-                if (bestValue == childValue) {
+            for(Node child : node.getChildren(2)) {
+                if (checkIfWon(child.board, 2)) {
+                    //computer already won, so return 1
+                    bestValue = 1;
                     node.bestCol = child.chosenCol;
                     node.bestRow = child.chosenRow;
-//                    System.out.format("(%d, %d) for %s = %d\n", child.chosenRow, child.chosenCol, "Player", bestValue);
+                } else {
+                    int childValue = minimax(child, false, depth - 1);
+                    bestValue = Math.max(bestValue, childValue);
+                    if (bestValue == childValue) {
+                        node.bestCol = child.chosenCol;
+                        node.bestRow = child.chosenRow;
+                    }
                 }
             }
             return bestValue;
@@ -113,13 +117,15 @@ public class GameLogic {
             //this is the player's level in the tree
             //the goal is to choose the worst move
             int bestValue = 1000000;
-            for(Node child : node.getChildren(2)) {
-                int childValue = node.getValue(1) + minimax(child, true, depth - 1);
-                bestValue = Math.min(bestValue, childValue);
-                if (bestValue == childValue) {
-//                    System.out.format("(%d, %d) for %s = %d\n", child.chosenRow, child.chosenCol, "Computer", bestValue);
-//                    node.bestCol = child.chosenCol;
-//                    node.bestRow = child.chosenRow;
+            for(Node child : node.getChildren(1)) {
+                if (checkIfWon(child.board, 1)) {
+                    //player already won, so return -1
+                    bestValue = -1;
+                    node.bestCol = child.chosenCol;
+                    node.bestRow = child.chosenRow;
+                } else {
+                    int childValue = minimax(child, true, depth - 1);
+                    bestValue = Math.min(bestValue, childValue);
                 }
             }
             return bestValue;
@@ -148,12 +154,10 @@ public class GameLogic {
                         n.chosenRow = row;
                         n.chosenCol = col;
                         childrenArrayList.add(n);
-//                        System.out.format("(%d, %d) = %d", row, col, id);
                         break;
                     }
                 }
             }
-//            System.out.println("it is " + childrenArrayList.get(0).board[2][0]);
             return childrenArrayList.toArray(new Node[childrenArrayList.size()]);
         }
         
@@ -167,21 +171,13 @@ public class GameLogic {
             return newBoard;
         }
         
-        public int getValue(int id) {
-            if (chosenRow == -1) {
-                return 0;
-            }
-            //System.out.format("(%d, %d) = %d\n", chosenRow, chosenCol, 1);
-            //System.out.format("(%d, %d) = %b\n", chosenRow, chosenCol, checkIfWon(chosenRow, chosenCol, 1));
+        public int getValue() {
             //value of the node based on how good it is to move there
-            if (checkIfWon(board, id)) {
-//                System.out.format("(%d, %d) = %d\n", chosenRow, chosenCol, 1);
+            if (checkIfWon(board, 2)) {
                 return 1;
-            } else if (checkIfWon(board, (id == 1) ? 2 : 1)) {
-//                System.out.format("(%d, %d) = %d\n", chosenRow, chosenCol, -1);
+            } else if (checkIfWon(board, 1)) {
                 return -1;
             } else {
-//                System.out.format("(%d, %d) = %d\n", chosenRow, chosenCol, 0);
                 return 0;
             }
         }
@@ -260,7 +256,7 @@ public class GameLogic {
             count = 0;
             int row = i;
             int col = 0;
-            while (row >= 0) {
+            while (row >= 0 && col < getColLength()) {
                 if (board[row][col] == id) {
                     count++;
                     if (count == 4) {
@@ -277,7 +273,7 @@ public class GameLogic {
             count = 0;
             int row = getRowLength() - 1;
             int col = j;
-            while (col < getColLength()) {
+            while (row >= 0 && col < getColLength()) {
                 if (board[row][col] == id) {
                     count++;
                     if (count == 4) {
@@ -299,7 +295,7 @@ public class GameLogic {
             count = 0;
             int row = i;
             int col = getColLength() - 1;
-            while (row >= 0) {
+            while (row >= 0 && col >= 0) {
                 if (board[row][col] == id) {
                     count++;
                     if (count == 4) {
@@ -316,7 +312,7 @@ public class GameLogic {
             count = 0;
             int row = getRowLength() - 1;
             int col = j;
-            while (col >= 0) {
+            while (row >= 0 && col >= 0) {
                 if (board[row][col] == id) {
                     count++;
                     if (count == 4) {
